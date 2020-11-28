@@ -13,6 +13,7 @@ struct DateList{
     int R4;
 };
 DateList Ddate[360*4];
+int getmultibitnum(QString::iterator&,QChar);
 QWDialog::QWDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::QWDialog)
@@ -76,6 +77,33 @@ void QWDialog::on_pushButton_clicked()//this is delete
     QString qstr=txtcur.selectedText();
     txtcur.removeSelectedText();
     ui->comboBox_2Select->removeItem(index);
+    QString::iterator p=qstr.end()-1;
+    perN=getmultibitnum(p,'*');
+    --p;
+    period=getmultibitnum(p,'\t');
+    --p;
+    day=getmultibitnum(p,'.');
+    --p;
+    mon=getmultibitnum(p,'.');
+    --p;
+    year=getmultibitnum(p,'\t');
+    --p;
+    Pnum=getmultibitnum(p,'*');
+    --p;
+    Product=getmultibitnum(p,'P')-1;
+    int AchieveDate=(year-1)*360+(mon-1)*30+day-1;
+    for(;perN;perN--){
+        int tmpdate=AchieveDate-Rtime[0];
+        Ddate[tmpdate].R1-=Pnum*P2R[0][Product];
+        tmpdate=AchieveDate-Rtime[1];
+        Ddate[tmpdate].R2-=Pnum*P2R[1][Product];
+        tmpdate=AchieveDate-Rtime[2];
+        Ddate[tmpdate].R3-=Pnum*P2R[2][Product];
+        tmpdate=AchieveDate-Rtime[3];
+        Ddate[tmpdate].R4-=Pnum*P2R[3][Product];
+        AchieveDate+=period;
+        if(AchieveDate>=360*4) break;
+    }
     Routput();
 }
 void QWDialog::qwinit(){
@@ -244,4 +272,9 @@ void QWDialog::Routput(){
     ui->textEditOutputList->append(s);
     s="R4*"+QString::number(sumR[3]);
     ui->textEditOutputList->append(s);
+}
+int getmultibitnum(QString::iterator &p,QChar ch){
+    QString tmp;
+    while(*p!=ch)tmp.push_front(*p--);
+    return tmp.toInt();
 }
